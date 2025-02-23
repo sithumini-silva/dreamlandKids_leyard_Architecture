@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,7 +19,6 @@ import lk.ijse.gdse71.dreamlandkids.bo.custom.CustomerBO;
 import lk.ijse.gdse71.dreamlandkids.db.DBConnection;
 import lk.ijse.gdse71.dreamlandkids.dto.CustomerDTO;
 import lk.ijse.gdse71.dreamlandkids.dto.tm.CustomerTM;
-import lk.ijse.gdse71.dreamlandkids.model.CustomerModel;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.JasperViewer;
 
@@ -94,11 +92,11 @@ public class CustomerController  implements Initializable {
             new Alert(Alert.AlertType.ERROR, "Fail to load customer id").show();
         }
     }
-    public void initialize(){
-
+    public void initialize() throws SQLException, ClassNotFoundException {
+        refreshPage();
     }
 
-    private void refreshPage() throws SQLException {
+    private void refreshPage() throws SQLException, ClassNotFoundException {
         loadNextCustomerId();
         loadTableData();
 
@@ -113,7 +111,6 @@ public class CustomerController  implements Initializable {
         txtPhone.setText("");
     }
 
-    CustomerModel customerModel = new CustomerModel();
 
     private void loadTableData() throws SQLException {
         ArrayList<CustomerDTO> customerDTOS = customerBo.getAllCustomers();
@@ -135,13 +132,13 @@ public class CustomerController  implements Initializable {
         tblCustomer.setItems(customerTMS);
     }
 
-    public void loadNextCustomerId() throws SQLException {
-        String nextCustomerId = customerModel.getNextCustomerId();
+    public void loadNextCustomerId() throws SQLException, ClassNotFoundException {
+        String nextCustomerId = customerBo.getNextCustomerId();
         lblCustomerId.setText(nextCustomerId);
     }
 
     @FXML
-    public void btnSaveOnAction(ActionEvent actionEvent) throws SQLException {
+    public void btnSaveOnAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
         String id = lblCustomerId.getText();
         String name = txtName.getText();
         String nic = txtNic.getText();
@@ -233,7 +230,7 @@ public class CustomerController  implements Initializable {
     }
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) throws SQLException {
+    void btnDeleteOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String customerId = lblCustomerId.getText();
 
         try {
@@ -319,7 +316,7 @@ public class CustomerController  implements Initializable {
     }
 
     @FXML
-    void resetOnAction(ActionEvent event) throws SQLException {
+    void resetOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         refreshPage();
     }
 

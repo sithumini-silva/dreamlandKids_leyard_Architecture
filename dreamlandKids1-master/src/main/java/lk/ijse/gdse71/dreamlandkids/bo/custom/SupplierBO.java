@@ -16,4 +16,7 @@ public interface SupplierBO extends SuperBO {
     boolean existSupplier(String id) throws SQLException;
 
     ArrayList<SupplierDTO> getAllSupplier() throws SQLException;
+
+    String getNextSupplierId() throws SQLException, ClassNotFoundException;
+
 }

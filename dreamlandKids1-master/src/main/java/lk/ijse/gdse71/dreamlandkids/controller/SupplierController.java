@@ -9,16 +9,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import lk.ijse.gdse71.dreamlandkids.bo.BOFactory;
-import lk.ijse.gdse71.dreamlandkids.bo.custom.CustomerBO;
 import lk.ijse.gdse71.dreamlandkids.bo.custom.SupplierBO;
-import lk.ijse.gdse71.dreamlandkids.dto.CustomerDTO;
 import lk.ijse.gdse71.dreamlandkids.dto.SupplierDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.tm.CustomerTM;
 import lk.ijse.gdse71.dreamlandkids.dto.tm.SupplierTM;
-import lk.ijse.gdse71.dreamlandkids.model.CustomerModel;
-import lk.ijse.gdse71.dreamlandkids.model.SupplierModel;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -73,7 +67,7 @@ public class SupplierController  implements Initializable {
 
 
     @FXML
-    void btnDeleteOnAction(ActionEvent event) throws SQLException {
+    void btnDeleteOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String supplierId = lblSupplierId.getText();
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?", ButtonType.YES, ButtonType.NO);
@@ -82,6 +76,7 @@ public class SupplierController  implements Initializable {
         boolean isDeleted=supplierBO.deleteSupplier(supplierId);
         if (isDeleted){
             new Alert(Alert.AlertType.CONFIRMATION,"Customer Deleted"+supplierId).show();
+            refreshPage();
         }
 
     }
@@ -146,9 +141,12 @@ public class SupplierController  implements Initializable {
                     } else {
                         supplierBO.saveSupplier(new SupplierDTO(supplierId, name, nic, email, phone));
                         tblSupplier.getItems().add(new SupplierTM(supplierId, name, nic, email, phone));
+                        refreshPage();
                     }
                 } catch (SQLException e) {
                     new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -211,12 +209,15 @@ public class SupplierController  implements Initializable {
                 boolean updateSuccess = supplierBO.updateSupplier(supplierDTO);
                 if (updateSuccess) {
                     loadTableData();
+                    refreshPage();
                     new Alert(Alert.AlertType.INFORMATION, "Supplier updated successfully").show();
                 } else {
                     new Alert(Alert.AlertType.ERROR, "Failed to update supplier.").show();
                 }
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -239,7 +240,7 @@ public class SupplierController  implements Initializable {
     }
 
     @FXML
-    void resetOnAction(ActionEvent event) throws SQLException {
+    void resetOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         refreshPage();
     }
 
@@ -259,7 +260,7 @@ public class SupplierController  implements Initializable {
         }
     }
 
-    private void refreshPage() throws SQLException{
+    private void refreshPage() throws SQLException, ClassNotFoundException {
         loadNextSupplierId();
         loadTableData();
 
@@ -273,8 +274,6 @@ public class SupplierController  implements Initializable {
         txtSupmail.setText("");
         txtSupPhone.setText("");
     }
-
-    SupplierModel supplierModel = new SupplierModel();
 
     private void loadTableData() throws SQLException {
         ArrayList<SupplierDTO> supplierDTOS = supplierBO.getAllSupplier();
@@ -293,8 +292,8 @@ public class SupplierController  implements Initializable {
         tblSupplier.setItems(supplierTMS);
     }
 
-    private void loadNextSupplierId() throws SQLException {
-        String nextSupplierId = supplierModel.getNextSupplierId();
+    private void loadNextSupplierId() throws SQLException, ClassNotFoundException {
+        String nextSupplierId = supplierBO.getNextSupplierId();
         lblSupplierId.setText(nextSupplierId);
     }
 }

@@ -52,4 +52,10 @@ public class SupplierBOImpl implements SupplierBO {
         }
         return allSuppliers;
     }
+
+    @Override
+    public String getNextSupplierId() throws SQLException, ClassNotFoundException {
+        return supplierDAO.generateNewId();
+
+    }
 }

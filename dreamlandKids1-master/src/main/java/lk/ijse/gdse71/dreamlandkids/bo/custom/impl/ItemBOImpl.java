@@ -3,11 +3,7 @@ package lk.ijse.gdse71.dreamlandkids.bo.custom.impl;
 import lk.ijse.gdse71.dreamlandkids.bo.custom.ItemBO;
 import lk.ijse.gdse71.dreamlandkids.dao.DAOFactory;
 import lk.ijse.gdse71.dreamlandkids.dao.custom.ItemDAO;
-import lk.ijse.gdse71.dreamlandkids.dto.CustomerDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.EmployeeDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.ItemDTO;
-import lk.ijse.gdse71.dreamlandkids.entity.Customer;
-import lk.ijse.gdse71.dreamlandkids.entity.Employee;
+import lk.ijse.gdse71.dreamlandkids.dto.*;
 import lk.ijse.gdse71.dreamlandkids.entity.Item;
 
 import java.sql.SQLException;
@@ -62,5 +58,18 @@ public class ItemBOImpl implements ItemBO {
         return new Item(i.getItemId(),i.getItemName(),i.getQuantity(),i.getPrice());
 
     }
+
+    @Override
+    public String getNextItemId() throws SQLException, ClassNotFoundException {
+        return itemDAO.generateNewId();
+
+    }
+
+    @Override
+    public boolean reduceItemQty(OrderDetailsDTO orderDetailsDTO) throws SQLException {
+        return itemDAO.reduceQty(orderDetailsDTO);
+    }
+
+
 }
 

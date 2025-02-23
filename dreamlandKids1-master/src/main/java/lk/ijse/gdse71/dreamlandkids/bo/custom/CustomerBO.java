@@ -20,5 +20,7 @@ public interface CustomerBO extends SuperBO {
 
     Customer findById(String selectedCustomerId) throws SQLException;
 
+    String getNextCustomerId() throws SQLException, ClassNotFoundException;
+
 //    String getNextCustomerId();
 }

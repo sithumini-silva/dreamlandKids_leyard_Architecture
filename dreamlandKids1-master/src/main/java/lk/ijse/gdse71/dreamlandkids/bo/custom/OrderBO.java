@@ -16,5 +16,8 @@ public interface OrderBO extends SuperBO {
 
     ArrayList<ItemDTO> getAllItems() throws SQLException;
 
+    String getNextOrderId() throws SQLException, ClassNotFoundException;
+
+
 //    String getNextCustomerId();
 }

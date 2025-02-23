@@ -47,13 +47,19 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
-    public boolean reduceQty(OrderDetailsDTO orderDetailsDTO) throws SQLException {
-        return SQLUtil.execute(
-                "update Item set quantity = quantity - ? where item_id = ?",
-                orderDetailsDTO.getQuantity(),
-                orderDetailsDTO.getItemId()
-        );
-    }
+    public String generateNewId() throws SQLException, ClassNotFoundException {
+        ResultSet rst = CrudUtil.execute("select item_id from Item order by item_id desc limit 1");
+
+        if (rst.next()) {
+            String lastId = rst.getString(1);
+            String substring = lastId.substring(1);
+            int i = Integer.parseInt(substring);
+            int newIdIndex = i + 1;
+            return String.format("I%03d", newIdIndex);
+        }
+        return "I001";    }
+
+
 
     @Override
     public Item search(String selectedItemId) throws SQLException {
@@ -71,4 +77,14 @@ public class ItemDAOImpl implements ItemDAO {
             return null;
         }
     }
+
+    public boolean reduceQty(OrderDetailsDTO orderDetailsDTO) throws SQLException {
+        return CrudUtil.execute(
+                "update Item set quantity = quantity - ? where item_id = ?",
+                orderDetailsDTO.getQuantity(),
+                orderDetailsDTO.getItemId()
+        );
+    }
+
+
 }

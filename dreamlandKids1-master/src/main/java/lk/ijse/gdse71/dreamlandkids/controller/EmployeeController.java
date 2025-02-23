@@ -9,16 +9,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import lk.ijse.gdse71.dreamlandkids.bo.BOFactory;
-import lk.ijse.gdse71.dreamlandkids.bo.custom.CustomerBO;
 import lk.ijse.gdse71.dreamlandkids.bo.custom.EmployeeBO;
-import lk.ijse.gdse71.dreamlandkids.dto.CustomerDTO;
 import lk.ijse.gdse71.dreamlandkids.dto.EmployeeDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.SupplierDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.tm.CustomerTM;
 import lk.ijse.gdse71.dreamlandkids.dto.tm.EmployeeTM;
-import lk.ijse.gdse71.dreamlandkids.dto.tm.SupplierTM;
-import lk.ijse.gdse71.dreamlandkids.model.EmployeeModel;
-import lk.ijse.gdse71.dreamlandkids.model.SupplierModel;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -84,9 +77,12 @@ public class EmployeeController  implements Initializable {
             boolean isDeleted=employeeBO.deleteEmployee(employeeId);
             if (isDeleted){
                 new Alert(Alert.AlertType.CONFIRMATION,"Employee Deleted").show();
+                refreshPage();
             }
         }catch (SQLException e){
             new Alert(Alert.AlertType.ERROR,"Failed employee deleted"+employeeId).show();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
 
@@ -148,12 +144,17 @@ public class EmployeeController  implements Initializable {
                 try {
                     if (existEmployee(employeeId)) {
                         new Alert(Alert.AlertType.ERROR, employeeId + " already exists").show();
+
                     } else {
                         employeeBO.saveEmployee(new EmployeeDTO(employeeId, name, nic, email, phone));
                         tblEmployee.getItems().add(new EmployeeTM(employeeId, name, nic, email, phone));
+                        refreshPage();
                     }
                 } catch (SQLException e) {
                     new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -217,12 +218,15 @@ public class EmployeeController  implements Initializable {
                 boolean updateSuccess = employeeBO.updateEmployee(employeeDTO);
                 if (updateSuccess) {
                     loadTableData();
+                    refreshPage();
                     new Alert(Alert.AlertType.INFORMATION, "Employee updated successfully").show();
                 } else {
                     new Alert(Alert.AlertType.ERROR, "Failed to update employee.").show();
                 }
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -243,7 +247,7 @@ public class EmployeeController  implements Initializable {
     }
 
     @FXML
-    void resetOnAction(ActionEvent event) throws SQLException {
+    void resetOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         refreshPage();
     }
 
@@ -263,7 +267,7 @@ public class EmployeeController  implements Initializable {
         }
     }
 
-    private void refreshPage() throws SQLException {
+    private void refreshPage() throws SQLException, ClassNotFoundException {
         loadNextEmployeeId();
         loadTableData();
 
@@ -277,8 +281,6 @@ public class EmployeeController  implements Initializable {
         txtEmpmail.setText("");
         txtEmpPhone.setText("");
     }
-
-    EmployeeModel employeeModel = new EmployeeModel();
 
     private void loadTableData() throws SQLException {
         ArrayList<EmployeeDTO> employeeDTOS = employeeBO.getAllEmployee();
@@ -297,8 +299,8 @@ public class EmployeeController  implements Initializable {
         tblEmployee.setItems(employeeTMS);
     }
 
-    private void loadNextEmployeeId() throws SQLException {
-        String nextEmployeeId = employeeModel.getNextEmployeeId();
+    private void loadNextEmployeeId() throws SQLException, ClassNotFoundException {
+        String nextEmployeeId = employeeBO.getNextEmployeeId();
         lblEmployeeId.setText(nextEmployeeId);
     }
 }

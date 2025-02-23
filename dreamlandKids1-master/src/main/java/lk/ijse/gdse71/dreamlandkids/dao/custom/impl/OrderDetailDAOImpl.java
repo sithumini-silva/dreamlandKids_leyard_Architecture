@@ -35,6 +35,10 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
         return null;
     }
 
+    @Override
+    public String generateNewId() throws SQLException, ClassNotFoundException {
+        return "";
+    }
 
 
     public boolean saveOrderDetail(OrderDetailsDTO orderDetailsDTO) throws SQLException {

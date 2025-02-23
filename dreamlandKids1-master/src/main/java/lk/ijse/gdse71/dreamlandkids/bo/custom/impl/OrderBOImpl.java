@@ -77,6 +77,11 @@ public class OrderBOImpl implements OrderBO {
         return itemDTOS;
     }
 
+    @Override
+    public String getNextOrderId() throws SQLException, ClassNotFoundException {
+        return orderDAO.generateNewId();
+    }
+
 
     public boolean saveOrderDetailsList(ArrayList<OrderDetailsDTO> orderDetailsDTOS) throws SQLException {
         for (OrderDetailsDTO orderDetailsDTO : orderDetailsDTOS) {

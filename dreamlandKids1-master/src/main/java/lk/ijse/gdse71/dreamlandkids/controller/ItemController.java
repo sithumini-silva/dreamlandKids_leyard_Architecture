@@ -9,13 +9,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import lk.ijse.gdse71.dreamlandkids.bo.BOFactory;
-import lk.ijse.gdse71.dreamlandkids.bo.custom.CustomerBO;
 import lk.ijse.gdse71.dreamlandkids.bo.custom.ItemBO;
-import lk.ijse.gdse71.dreamlandkids.dto.CustomerDTO;
 import lk.ijse.gdse71.dreamlandkids.dto.ItemDTO;
-import lk.ijse.gdse71.dreamlandkids.dto.tm.CustomerTM;
 import lk.ijse.gdse71.dreamlandkids.dto.tm.ItemTM;
-import lk.ijse.gdse71.dreamlandkids.model.ItemModel;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -68,7 +64,7 @@ public class ItemController implements Initializable {
 
 
     @FXML
-    void btnDeleteItemOnAction(ActionEvent event) throws SQLException {
+    void btnDeleteItemOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         String itemId = lblItemId.getText();
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?", ButtonType.YES, ButtonType.NO);
@@ -79,11 +75,12 @@ public class ItemController implements Initializable {
             boolean isDeleted = itemBO.deleteItem(itemId);
             if (isDeleted) {
                 new Alert(Alert.AlertType.CONFIRMATION, "Item Deleted").show();
+                refreshPage();
             }
         }
-        }
+    }
     @FXML
-    void btnResetOnAction(ActionEvent event) throws SQLException {
+    void btnResetOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         refreshPage();
     }
 
@@ -123,9 +120,12 @@ public class ItemController implements Initializable {
                     } else {
                         itemBO.saveItem(new ItemDTO(itemId, name, quantity, price));
                         tblItem.getItems().add(new ItemTM(itemId, name, quantity, price));
+                        refreshPage();
                     }
                 } catch (SQLException e) {
                     new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -174,12 +174,15 @@ public class ItemController implements Initializable {
                 boolean updateSuccess = itemBO.updateItem(itemDTO);
                 if (updateSuccess) {
                     loadTableData();
+                    refreshPage();
                     new Alert(Alert.AlertType.INFORMATION, "Item updated successfully").show();
                 } else {
                     new Alert(Alert.AlertType.ERROR, "Failed to update item.").show();
                 }
             } catch (SQLException e) {
                 new Alert(Alert.AlertType.ERROR, e.getMessage()).show();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -215,7 +218,7 @@ public class ItemController implements Initializable {
         }
     }
 
-    private void refreshPage() throws SQLException {
+    private void refreshPage() throws SQLException, ClassNotFoundException {
         loadNextItemId();
         loadTableData();
 
@@ -228,8 +231,6 @@ public class ItemController implements Initializable {
         txtPrice.setText("");
 
     }
-
-    ItemModel itemModel = new ItemModel();
 
     private void loadTableData() throws SQLException {
         ArrayList<ItemDTO> itemDTOS = itemBO.getAllItems();
@@ -248,8 +249,8 @@ public class ItemController implements Initializable {
         tblItem.setItems(itemTMS);
     }
 
-    private void loadNextItemId() throws SQLException {
-        String nextItemId = itemModel.getNextItemId();
+    private void loadNextItemId() throws SQLException, ClassNotFoundException {
+        String nextItemId = itemBO.getNextItemId();
         lblItemId.setText(nextItemId);
     }
 }

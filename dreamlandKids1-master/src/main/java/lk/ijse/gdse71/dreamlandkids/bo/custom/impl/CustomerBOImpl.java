@@ -58,4 +58,9 @@ public class CustomerBOImpl implements CustomerBO {
         Customer c=customerDAO.search(selectedCustomerId);
         return new Customer(c.getCustomerId(),c.getName(),c.getNic(),c.getEmail(),c.getPhone());
     }
+
+    @Override
+    public String getNextCustomerId() throws SQLException, ClassNotFoundException {
+        return customerDAO.generateNewId();
+    }
 }

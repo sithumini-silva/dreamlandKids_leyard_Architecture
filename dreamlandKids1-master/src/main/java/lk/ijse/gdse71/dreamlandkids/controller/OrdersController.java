@@ -18,9 +18,6 @@ import lk.ijse.gdse71.dreamlandkids.dto.OrderDetailsDTO;
 import lk.ijse.gdse71.dreamlandkids.dto.tm.CartTM;
 import lk.ijse.gdse71.dreamlandkids.entity.Customer;
 import lk.ijse.gdse71.dreamlandkids.entity.Item;
-import lk.ijse.gdse71.dreamlandkids.model.CustomerModel;
-import lk.ijse.gdse71.dreamlandkids.model.ItemModel;
-import lk.ijse.gdse71.dreamlandkids.model.OrderModel;
 
 import java.net.URL;
 import java.sql.Date;
@@ -64,10 +61,6 @@ public class OrdersController implements Initializable {
     @FXML
     private TextField txtAddToCartQty;
 
-    private final OrderModel orderModel = new OrderModel();
-    private final CustomerModel customerModel = new CustomerModel();
-    private final ItemModel itemModel = new ItemModel();
-
 
     OrderBO orderBO= (OrderBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.ORDER);
     CustomerBO customerBO= (CustomerBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CUSTOMER);
@@ -84,6 +77,8 @@ public class OrdersController implements Initializable {
             refreshPage();
         } catch (SQLException e) {
             new Alert(Alert.AlertType.ERROR, "Fail to load data..!").show();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -99,8 +94,8 @@ public class OrdersController implements Initializable {
         tblCart.setItems(cartTMS);
     }
 
-    private void refreshPage() throws SQLException {
-        lblOrderId.setText(orderModel.getNextOrderId());
+    private void refreshPage() throws SQLException, ClassNotFoundException {
+        lblOrderId.setText(orderBO.getNextOrderId());
         orderDate.setText(LocalDate.now().toString());
 
         loadCustomerIds();
@@ -226,7 +221,7 @@ public class OrdersController implements Initializable {
     }
 
     @FXML
-    void btnPlaceOrderOnAction(ActionEvent event) throws SQLException {
+    void btnPlaceOrderOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         if (tblCart.getItems().isEmpty()) {
             new Alert(Alert.AlertType.ERROR, "Please add items to cart..!").show();
             return;
@@ -262,8 +257,10 @@ public class OrdersController implements Initializable {
 
         boolean isSaved = orderBO.saveOrder(orderDTO);
 
+
         if (isSaved) {
             new Alert(Alert.AlertType.INFORMATION, "Order saved..!").show();
+
 
             refreshPage();
         } else {
@@ -272,7 +269,7 @@ public class OrdersController implements Initializable {
     }
 
     @FXML
-    void btnResetOnAction(ActionEvent event) throws SQLException {
+    void btnResetOnAction(ActionEvent event) throws SQLException, ClassNotFoundException {
         refreshPage();
     }
 
